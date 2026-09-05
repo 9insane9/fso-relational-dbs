@@ -10,7 +10,7 @@ const blogFinder = async (req, res, next) => {
   next();
 };
 
-router.get("/api/blogs", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const blogs = await Blog.findAll();
     return res.json(blogs);
@@ -19,7 +19,7 @@ router.get("/api/blogs", async (req, res) => {
   }
 });
 
-router.get("/api/blogs/:id", blogFinder, async (req, res) => {
+router.get("/:id", blogFinder, async (req, res) => {
   try {
     res.json(req.blog);
   } catch (error) {
@@ -27,7 +27,7 @@ router.get("/api/blogs/:id", blogFinder, async (req, res) => {
   }
 });
 
-router.post("/api/blogs", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const blog = await Blog.create({ ...req.body, date: new Date() });
     return res.json(blog);
@@ -36,7 +36,22 @@ router.post("/api/blogs", async (req, res) => {
   }
 });
 
-router.delete("/api/blogs/:id", blogFinder, async (req, res) => {
+//updating likes
+router.put("/:id", blogFinder, async (req, res) => {
+  try {
+    if (!req.blog) {
+      res.status(404).json({ error: "Blog not found" });
+    }
+    req.blog.likes = req.body.likes;
+    await req.blog.save();
+
+    res.status(200).json(req.blog);
+  } catch (error) {
+    return res.status(400).json({ error });
+  }
+});
+
+router.delete("/:id", blogFinder, async (req, res) => {
   try {
     if (!req.blog) {
       res.status(404).json({ error: "Blog not found" });
