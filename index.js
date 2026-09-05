@@ -52,10 +52,44 @@ Blog.init(
   },
 );
 
+Blog.sync();
+
+app.get("/api/blogs", async (req, res) => {
+  try {
+    const blogs = await Blog.findAll();
+    return res.json(blogs);
+  } catch (error) {
+    return res.status(400).json({ error });
+  }
+});
+
+// app.get("/api/blogs/:id", async (req, res) => {
+//   try {
+//     const blog = await Blog.findByPk(req.params.id);
+//     res.json(blog);
+//   } catch (error) {
+//     res.status(404).json({ error });
+//   }
+// });
+
 app.post("/api/blogs", async (req, res) => {
   try {
     const blog = await Blog.create({ ...req.body, date: new Date() });
     return res.json(blog);
+  } catch (error) {
+    return res.status(400).json({ error });
+  }
+});
+
+app.delete("/api/blogs/:id", async (req, res) => {
+  try {
+    const blog = await Blog.findByPk(req.params.id);
+
+    if (!blog) {
+      res.status(404).json({ error: "Blog not found" });
+    }
+    await blog.destroy();
+    res.status(204).end();
   } catch (error) {
     return res.status(400).json({ error });
   }
