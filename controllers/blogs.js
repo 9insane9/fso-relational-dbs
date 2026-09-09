@@ -1,5 +1,7 @@
 const router = require("express").Router();
-const { Blog } = require("../models");
+const { Blog, User } = require("../models");
+const tokenExtractor = require("../util/tokenExtractor");
+const { Op } = require("sequelize");
 
 const blogFinder = async (req, res, next) => {
   req.blog = await Blog.findByPk(req.params.id);
@@ -10,18 +12,51 @@ const blogFinder = async (req, res, next) => {
   next();
 };
 
+//getting all blogs
 router.get("/", async (req, res) => {
-  const blogs = await Blog.findAll();
+  const where = {};
+
+  if (req.query.search) {
+    where[Op.or] = [
+      {
+        title: {
+          [Op.substring]: req.query.search,
+        },
+      },
+      {
+        author: {
+          [Op.substring]: req.query.search,
+        },
+      },
+    ];
+  }
+
+  const blogs = await Blog.findAll({
+    attributes: { exclude: ["userId"] },
+    include: {
+      model: User,
+      attributes: ["name"],
+    },
+    order: [["likes", "DESC"]],
+    where,
+  });
+
   return res.json(blogs);
 });
 
+//getting one
 router.get("/:id", blogFinder, async (req, res) => {
   res.json(req.blog);
 });
 
 //creation
-router.post("/", async (req, res) => {
-  const blog = await Blog.create({ ...req.body, date: new Date() });
+router.post("/", tokenExtractor, async (req, res) => {
+  const user = await User.findByPk(req.decodedToken.id);
+  const blog = await Blog.create({
+    ...req.body,
+    userId: user.id,
+    date: new Date(),
+  });
   return res.status(201).json(blog);
 });
 
@@ -32,9 +67,14 @@ router.put("/:id", blogFinder, async (req, res) => {
   res.json(req.blog);
 });
 
-router.delete("/:id", blogFinder, async (req, res) => {
-  await req.blog.destroy();
-  res.status(204).end();
+//deletion
+router.delete("/:id", tokenExtractor, blogFinder, async (req, res) => {
+  const user = await User.findByPk(req.decodedToken.id);
+  if (req.blog.userId === user.id) {
+    await req.blog.destroy();
+    return res.status(204).end();
+  }
+  return res.status(403).end();
 });
 
 module.exports = router;
