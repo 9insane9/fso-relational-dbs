@@ -7,7 +7,7 @@ const loginRouter = require("./controllers/login");
 const authorsRouter = require("./controllers/authors");
 const resetRouter = require("./controllers/reset");
 const errorHandler = require("./util/errorHandler");
-const { syncModels } = require("./models");
+// const { syncModels } = require("./models");
 
 const app = express();
 app.use(express.json());
@@ -26,7 +26,7 @@ app.use(errorHandler);
 
 const start = async () => {
   await connectToDatabase();
-  await syncModels(); //race condition fix?
+  // await syncModels(); //race condition fix? no longer necessary with migrations
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 
