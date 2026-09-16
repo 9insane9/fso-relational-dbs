@@ -12,9 +12,6 @@ module.exports = {
         type: DataTypes.STRING,
         unique: true,
         allowNull: false,
-        validate: {
-          isEmail: true,
-        },
       },
       name: {
         type: DataTypes.STRING,
@@ -44,16 +41,10 @@ module.exports = {
       url: {
         type: DataTypes.TEXT,
         allowNull: false,
-        validate: {
-          notEmpty: true,
-        },
       },
       title: {
         type: DataTypes.TEXT,
         allowNull: false,
-        validate: {
-          notEmpty: true,
-        },
         likes: {
           type: DataTypes.INTEGER,
           defaultValue: 0,
