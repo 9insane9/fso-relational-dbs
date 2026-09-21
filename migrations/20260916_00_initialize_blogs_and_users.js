@@ -35,9 +35,6 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
       },
-      author: {
-        type: DataTypes.TEXT,
-      },
       url: {
         type: DataTypes.TEXT,
         allowNull: false,
@@ -45,10 +42,13 @@ module.exports = {
       title: {
         type: DataTypes.TEXT,
         allowNull: false,
-        likes: {
-          type: DataTypes.INTEGER,
-          defaultValue: 0,
-        },
+      },
+      author: {
+        type: DataTypes.TEXT,
+      },
+      likes: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
       },
       user_id: {
         type: DataTypes.INTEGER,

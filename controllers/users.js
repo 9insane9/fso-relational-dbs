@@ -1,17 +1,20 @@
 const router = require("express").Router();
 const tokenExtractor = require("../util/tokenExtractor");
 const { User, Blog } = require("../models");
+const { Op } = require("sequelize");
 const bcrypt = require("bcrypt");
 
 //get all
 router.get("/", async (req, res) => {
   const users = await User.findAll({
-    include: {
-      model: Blog,
-      attributes: {
-        exclude: ["userId", "passwordHash"],
+    include: [
+      {
+        model: Blog,
+        attributes: {
+          exclude: ["userId", "passwordHash"],
+        },
       },
-    },
+    ],
   });
   res.json(users);
 });
@@ -19,9 +22,26 @@ router.get("/", async (req, res) => {
 //get one
 router.get("/:id", async (req, res) => {
   const user = await User.findByPk(req.params.id, {
-    attributes: {
-      exclude: ["passwordHash"],
-    },
+    attributes: { exclude: ["passwordHash", "createdAt", "updatedAt"] },
+    include: [
+      {
+        model: Blog,
+        attributes: { exclude: ["userId"] },
+      },
+      {
+        model: Blog,
+        as: "readings",
+        attributes: { exclude: ["userId", "createdAt", "updatedAt"] },
+        through: {
+          attributes: ["read", "id"],
+          where: {
+            read: {
+              [Op.eq]: req.query.read,
+            },
+          },
+        },
+      },
+    ],
   });
 
   res.json(user);

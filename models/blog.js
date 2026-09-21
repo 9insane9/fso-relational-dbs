@@ -9,9 +9,6 @@ Blog.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    author: {
-      type: DataTypes.TEXT,
-    },
     url: {
       type: DataTypes.TEXT,
       allowNull: false,
@@ -26,9 +23,21 @@ Blog.init(
         notEmpty: true,
       },
     },
+    author: {
+      type: DataTypes.TEXT,
+    },
     likes: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
+    },
+    yearWritten: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: null,
+      validate: {
+        min: 1991,
+        max: new Date().getFullYear(),
+      },
     },
   },
   {
