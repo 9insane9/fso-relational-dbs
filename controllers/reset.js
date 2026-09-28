@@ -1,7 +1,15 @@
 const router = require("express").Router();
-const { User, Blog } = require("../models");
+const { User, Blog, Session, ReadingList } = require("../models");
 
 router.post("/", async (req, res) => {
+  await ReadingList.destroy({
+    where: {},
+  });
+
+  await Session.destroy({
+    where: {},
+  });
+
   await Blog.destroy({
     where: {},
   });

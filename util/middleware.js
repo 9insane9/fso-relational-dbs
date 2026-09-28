@@ -5,8 +5,10 @@ const { Blog, User, Session } = require("../models");
 
 const tokenExtractor = async (req, res, next) => {
   const authorization = req.get("authorization");
-  const token = authorization.substring(7);
+
   if (authorization && authorization.toLowerCase().startsWith("bearer ")) {
+    const token = authorization.substring(7);
+
     try {
       req.decodedToken = jwt.verify(token, SECRET);
       req.token = token;
