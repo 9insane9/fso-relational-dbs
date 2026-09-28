@@ -1,19 +1,43 @@
 const jwt = require("jsonwebtoken");
 const { SECRET } = require("./config");
 const { Sequelize, ValidationError } = require("sequelize");
-const { Blog, User } = require("../models");
+const { Blog, User, Session } = require("../models");
 
-const tokenExtractor = (req, res, next) => {
+const tokenExtractor = async (req, res, next) => {
   const authorization = req.get("authorization");
+  const token = authorization.substring(7);
   if (authorization && authorization.toLowerCase().startsWith("bearer ")) {
     try {
-      req.decodedToken = jwt.verify(authorization.substring(7), SECRET);
-    } catch {
-      return res.status(401).json({ error: "token invalid" });
+      req.decodedToken = jwt.verify(token, SECRET);
+      req.token = token;
+    } catch (error) {
+      return res.status(401).json({ error });
     }
   } else {
     return res.status(401).json({ error: "token missing" });
   }
+  next();
+};
+
+const sessionValidator = async (req, res, next) => {
+  const session = await Session.findOne({
+    where: { token: req.token },
+  });
+
+  if (!session) {
+    return res.status(401).json({ error: "invalid session" });
+  }
+
+  const user = await User.findByPk(req.decodedToken.id);
+
+  if (user.disabled) {
+    await Session.destroy({
+      where: { userId: user.id },
+    });
+
+    return res.status(401).json({ error: "user is disabled" });
+  }
+
   next();
 };
 
@@ -41,4 +65,4 @@ const errorHandler = (err, req, res, next) => {
   return next(err);
 };
 
-module.exports = { tokenExtractor, errorHandler, blogFinder };
+module.exports = { tokenExtractor, errorHandler, blogFinder, sessionValidator };

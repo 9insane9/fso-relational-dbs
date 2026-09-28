@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const tokenExtractor = require("../util/tokenExtractor");
+const { tokenExtractor, sessionValidator } = require("../util/middleware");
 const { User, Blog } = require("../models");
 const { Op } = require("sequelize");
 const bcrypt = require("bcrypt");
@@ -68,11 +68,12 @@ router.post("/", async (req, res) => {
 });
 
 //name update
-router.put("/:username", tokenExtractor, async (req, res) => {
+router.put("/:username", tokenExtractor, sessionValidator, async (req, res) => {
   const user = await User.findOne({
     where: { username: req.params.username },
   });
 
+  //only user can only change their own name
   if (user.id !== req.decodedToken.id) {
     return res.status(403).end();
   }
