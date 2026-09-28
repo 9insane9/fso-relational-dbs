@@ -30,7 +30,7 @@ Blog.init(
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },
-    yearWritten: {
+    year: {
       type: DataTypes.INTEGER,
       allowNull: true,
       defaultValue: null,

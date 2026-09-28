@@ -26,6 +26,11 @@ User.init(
     passwordHash: {
       type: DataTypes.STRING,
     },
+    disabled: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
   },
   {
     sequelize,
