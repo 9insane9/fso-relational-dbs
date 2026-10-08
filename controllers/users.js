@@ -48,7 +48,11 @@ router.get("/:id", async (req, res) => {
     ],
   });
 
-  res.json(user);
+  if (!user) {
+    return res.status(404).end();
+  }
+
+  return res.json(user);
 });
 
 //create new
@@ -62,6 +66,7 @@ router.post("/", async (req, res) => {
   await user.save();
 
   res.json({
+    id: user.id,
     username: user.username,
     name: user.name,
   });

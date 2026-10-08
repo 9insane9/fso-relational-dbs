@@ -6,18 +6,19 @@ const { Blog, User, Session } = require("../models");
 const tokenExtractor = async (req, res, next) => {
   const authorization = req.get("authorization");
 
-  if (authorization && authorization.toLowerCase().startsWith("bearer ")) {
-    const token = authorization.substring(7);
-
-    try {
-      req.decodedToken = jwt.verify(token, SECRET);
-      req.token = token;
-    } catch (error) {
-      return res.status(401).json({ error });
-    }
-  } else {
+  if (!authorization || !authorization.toLowerCase().startsWith("bearer ")) {
     return res.status(401).json({ error: "token missing" });
   }
+
+  const token = authorization.substring(7);
+
+  try {
+    req.decodedToken = jwt.verify(token, SECRET);
+    req.token = token;
+  } catch (error) {
+    return res.status(401).json({ error });
+  }
+
   next();
 };
 
