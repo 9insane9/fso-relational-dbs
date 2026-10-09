@@ -47,8 +47,8 @@ describe("Reading Lists API", () => {
     );
     // changed field names from blog_id to blogId, same for user
     assert.ok([200, 201].includes(response.status));
-    assert.strictEqual(response.data.blog_id, createdBlogId);
-    assert.strictEqual(response.data.user_id, testData.users[0].id);
+    assert.strictEqual(response.data.blogId, createdBlogId);
+    assert.strictEqual(response.data.userId, testData.users[0].id);
     assert.strictEqual(response.data.read, false);
   });
 
@@ -413,7 +413,7 @@ describe("Integration: Reading Lists and Sessions", () => {
     );
 
     assert.ok([200, 201].includes(response.status));
-    assert.strictEqual(response.data.blog_id, integrationBlogId);
+    assert.strictEqual(response.data.blogId, integrationBlogId);
     integrationReadingListId = response.data.id;
   });
 
